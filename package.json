@@ -5,6 +5,7 @@
     "author": "Sven Helmberger",
     "license": "Apache-2.0",
     "dependencies": {
+        "classnames": "^2.3.1",
         "debounce": "^1.2.1",
         "domready": "^1.0.8",
         "performance-now": "^2.1.0",

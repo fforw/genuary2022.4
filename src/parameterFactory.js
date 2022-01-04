@@ -60,7 +60,7 @@ function parse(str, version)
 
 function paramFactory(name, choices, overrideEntry, debug)
 {
-    const wr = (!overrideEntry || overrideEntry.choice !== undefined) && weightedRandomFn(choices);
+    const weighted = (!overrideEntry || overrideEntry.choice !== undefined) && weightedRandomFn(choices);
 
     return () => {
 
@@ -70,15 +70,10 @@ function paramFactory(name, choices, overrideEntry, debug)
             {
                 console.log("Param '" + name + "': Override = ", override)
             }
-            return () => getOverrideValue(overrideEntry, wr)
+            return () => getOverrideValue(overrideEntry, weighted)
         }
 
-        const result = wr()
-        if (debug)
-        {
-            console.log("Param '" + name + "': weighted random result = ", result)
-        }
-        return result
+        return weighted()
 
     }
 }
@@ -107,14 +102,11 @@ function getOverrideValue(entry, wrFn)
 
 export default function parameterFactory(paramConfig, overrides, debug = false)
 {
-
-
     let weights, overrideMap;
     if (overrides)
     {
         ({ weights, overrides : overrideMap } = overrides)
     }
-
 
     if (weights)
     {
@@ -148,9 +140,16 @@ export default function parameterFactory(paramConfig, overrides, debug = false)
                 const choiceFn = paramFactory(name, entry.choices, overrideMap && overrideMap.hasOwnProperty(name) && overrideMap[name], debug);
 
                 const factory = (...args) => {
-                    const fn = choiceFn(...args);
+                    const fn = choiceFn();
                     factory.repeat = fn
-                    return fn();
+                    const result = fn(...args);
+
+                    if (debug)
+                    {
+                        console.log("Param '" + name + "': weighted random result = ", result)
+                    }
+
+                    return result;
                 }
                 params[name] = factory
             }

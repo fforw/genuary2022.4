@@ -21,11 +21,22 @@ body
     right: 0;
     background: #000;
     color: #ccc;
-    font-family: monospace;
-    font-size: 0.8rem;
 }
 
 #ui a
 {
     color: #fff;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+
+#param-ui
+{
+    position: absolute;
+    bottom: 1.5rem;
+    background: #000;
+    color: #ccc;
+    right: 0;
+    max-height: 96vh;
+    overflow: auto;
 }

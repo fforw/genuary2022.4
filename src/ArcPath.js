@@ -1,15 +1,5 @@
 import { TAU } from "./constants";
-import Color from "./Color";
 
-
-function randomRadius(config, params)
-{
-    const minSize = params.radiusMin(config)
-    const maxSize = params.radiusMax(config)
-    const radiusPower = params.radiusPower(config)
-    return minSize + Math.pow(Math.random(), radiusPower) * (maxSize - minSize)
-
-}
 
 function wrap(number)
 {
@@ -48,8 +38,6 @@ export default class ArcPath {
 
     reset = false;
 
-    nextAngle = 0;
-
     clockwise = true;
 
     lineWidth = 0;
@@ -60,9 +48,10 @@ export default class ArcPath {
 
     alive = true
 
-    constructor(palette, config, params)
+    constructor(palette, config, params,background)
     {
         this.palette = palette;
+        this.background = background
         this.config = config
         this.params = params
         this.init()
@@ -73,61 +62,90 @@ export default class ArcPath {
     {
         const { config, params } = this
 
-        let r = randomRadius(params);
+        let r = params.radius(config);
 
-        const [x,y,angle] = params.start()
+        const [x,y,angle] = params.start(config,params)
 
         this.startAngle = angle;
         this.endAngle = wrap(angle + TAU/2);
         this.r = r;
         this.x = x;
         this.y = y;
-        this.color = params.stroke(this.palette)
-        this.step = params.step(this.palette)
-        this.nextColor = params.nextColor(this.palette)
-        this.reset = true;
-        this.lineWidth = (3 + Math.random() * 3)|0
+        this.color = params.stroke(this.palette, this.background)
+        this.step = params.step()
+        this.colorStep = params.colorStep(params)
+        this.lifeTime = params.lifeTime(this.palette)
+        this.lineWidth = params.lineWidth(r)
+        this.lineStep = params.lineStep(params)
     }
 
     draw(ctx)
     {
         const { config, params } = this
 
-        this.reset = false;
-        const { width, height } = this.config
 
-        let { startAngle, endAngle, r, x, y, clockwise, color, lineWidth} = this;
+        let { startAngle, endAngle, r, x, y, clockwise, color, lineWidth, step} = this;
 
-        const nextAngle = wrap(-TAU/4 - TAU * 0.35 + TAU * 0.7 * Math.random() );
-        let nextRadius =  randomRadius(config, params)
+        if (!clockwise)
+        {
+            step = -step
+        }
+
 
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = color
         ctx.beginPath();
-        ctx.arc( x, y, r, startAngle, endAngle, !clockwise )
+        ctx.arc( x, y, r, startAngle, startAngle + step, !clockwise )
         ctx.stroke();
 
-        startAngle = wrap(endAngle - TAU/2 );
-        x += Math.cos(endAngle) * r
-        y += Math.sin(endAngle) * r
-
-        if (y < 0 || y >= height)
+        if (this.colorStep !== 0 && this.colorStep-- === 1)
         {
-            this.init();
+            this.color = params.stroke(this.palette)
+            this.colorStep = this.params.colorStep.repeat()
+        }
+
+        if (this.lineStep !== 0 && this.lineStep-- === 1)
+        {
+            this.lineWidth = params.lineWidth(r)
+            this.lineStep = this.params.lineStep.repeat()
+        }
+
+        if (this.lifeTime-- < 0)
+        {
+            return false
         }
         else
         {
+            if (Math.abs(endAngle - (startAngle + step)) > this.step)
+            {
+                ctx.beginPath();
+                ctx.arc( x, y, r, startAngle + step, endAngle, !clockwise )
+                ctx.stroke();
+                this.startAngle = wrap(startAngle + step);
+            }
+            else
+            {
+                const nextAngle = wrap(TAU * Math.random() );
+                let nextRadius =  params.radius.repeat(config)
 
-            x += Math.cos(startAngle + TAU/2) * nextRadius
-            y += Math.sin(startAngle + TAU/2) * nextRadius
+                startAngle = wrap(endAngle - TAU/2 );
+                x += Math.cos(endAngle) * r
+                y += Math.sin(endAngle) * r
 
-            this.clockwise = !clockwise;
-            this.startAngle = startAngle;
-            this.endAngle = wrap(nextAngle );
-            this.r = nextRadius;
+                x += Math.cos(startAngle + TAU/2) * nextRadius
+                y += Math.sin(startAngle + TAU/2) * nextRadius
 
-            this.x = x
-            this.y = y
+                this.startAngle = startAngle;
+                this.x = x
+                this.y = y
+                this.clockwise = !clockwise;
+                this.endAngle = wrap(nextAngle );
+                this.r = nextRadius;
+
+            }
+
+
+            return true
         }
     }
 }

@@ -3,10 +3,10 @@ import assert from "power-assert";
 import parameterFactory from "../src/parameterFactory";
 
 const isCloseTo = (a,b) => {
-    // XXX: dunno if 1.5% deviation is really the max.
+    // XXX: dunno if 2% deviation is really the max.
     const deviation = Math.abs(1 - a / b);
     //console.log("deviation", deviation)
-    return deviation < 0.015
+    return deviation < 0.02
 }
 
 describe("ParameterFactory", function(){
@@ -14,6 +14,8 @@ describe("ParameterFactory", function(){
 	{
 
         const p = parameterFactory( {
+            // XXX: keys starting with underline are ignored
+            _ignored: "",
             foo: {
                 info: "Test function",
                 choices: [1, () => 1000,1, () => 2000,1, () => 3000]
@@ -21,11 +23,28 @@ describe("ParameterFactory", function(){
 
         })
 
+        assert(typeof p.foo === "function")
+        assert(typeof p._ignored === "undefined")
+
         const result = p.foo();
         assert(result === 1000 || result === 2000 || result === 3000)
 
         // params.name.repeat() allows to reevaluate latest weight function
         assert(p.foo.repeat() === result)
+    });
+
+    it("allows parameterization of the parameter generation", function()
+    {
+
+        const p = parameterFactory( {
+            foo: {
+                info: "Test function",
+                choices: [1, (a,b) => a+b]
+            }
+
+        })
+
+        assert(p.foo(3,4) === 7)
     });
 
     it("chooses according to random weights", function()

@@ -34,8 +34,8 @@ const palettes = [
     ["#f26d85", "#bf214b", "#c1d0d9", "#0e6973", "#0e7373"],
     ["#224021", "#5f8c4a", "#59734d", "#35402d", "#592c22"],
     ["#034c8c", "#69a7bf", "#f2e205", "#f2cb05", "#f2d49b"],
-    ["#bf2633", "#f2b90f", "#f2b33d", "#a67a29", "#a66249"]
-        ["#eeeeee", "#00adb5", "#393e46", "#222831"],
+    ["#bf2633", "#f2b90f", "#f2b33d", "#a67a29", "#a66249"],
+    ["#eeeeee", "#00adb5", "#393e46", "#222831"],
     ["#6a2c70", "#b83b5e", "#f08a5d", "#f9ed69"],
     ["#95e1d3", "#eaffd0", "#fce38a", "#f38181"],
     ["#eaeaea", "#ff2e63", "#252a34", "#08d9d6"],
@@ -100,8 +100,8 @@ const palettes = [
     ["#2eb872", "#a3de83", "#feffe4", "#fa4659"],
     ["#355c7d", "#c06c84", "#f67280", "#f8b195"],
     ["#d988bc", "#ffa8b8", "#ffd2a5", "#ffffc1"],
-    ["#70a1d7", "#a1de93", "#f7f48b", "#f47c7c"]
-        ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900"],
+    ["#70a1d7", "#a1de93", "#f7f48b", "#f47c7c"],
+    ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900"],
     ["#FE4365", "#FC9D9A", "#F9CDAD", "#C8C8A9", "#83AF9B"],
     ["#ECD078", "#D95B43", "#C02942", "#542437", "#53777A"],
     ["#556270", "#4ECDC4", "#C7F464", "#FF6B6B", "#C44D58"],
@@ -113,8 +113,8 @@ const palettes = [
     ["#FF4E50", "#FC913A", "#F9D423", "#EDE574", "#E1F5C4"],
     ["#99B898", "#FECEA8", "#FF847C", "#E84A5F", "#2A363B"],
     ["#655643", "#80BCA3", "#F6F7BD", "#E6AC27", "#BF4D28"],
-    ["#00A8C6", "#40C0CB", "#F9F2E7", "#AEE239", "#8FBE00"]
-        ["#8a00d4", "#d527b7", "#f782c2", "#f9c46b", "#e3e3e3"],
+    ["#00A8C6", "#40C0CB", "#F9F2E7", "#AEE239", "#8FBE00"],
+    ["#8a00d4", "#d527b7", "#f782c2", "#f9c46b", "#e3e3e3"],
     ["#e74645", "#fb7756", "#facd60", "#fdfa66", "#1ac0c6"],
     ["#454d66", "#309975", "#58b368", "#dad873", "#efeeb4"],
     ["#361d32", "#543c52", "#f55951", "#edd2cb", "#f1e8e6"],
@@ -130,8 +130,7 @@ const palettes = [
     ["#ffa822", "#134e6f", "#ff6150", "#1ac0c6", "#dee0e6"]
 ]
 
-export default function getRandomPalette(rnd = Math.random(), filter)
-{
+export default function getRandomPalette(rnd = Math.random(), filter) {
     const selection = typeof filter === "function" ? palettes.filter(filter) : palettes
     return selection[0 | rnd * selection.length]
 }
